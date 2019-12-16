@@ -9,6 +9,7 @@ module.exports = {
             if (ctx.request.path.startsWith(pathPrefix)) {
                 console.log(`Process API ${ctx.request.method} ${ctx.request.url}...`);
                 ctx.rest = (data) => {
+                    console.log('data',data)
                     ctx.response.type = 'application/json';
                     ctx.response.body = data;
                 }

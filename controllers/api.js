@@ -3,52 +3,44 @@ const model = require('../model');
 let
     Pet = model.Pet,
     User = model.User;
-var gid = 0;
 
 function nextId() {
-    gid ++;
-    return 't' + gid;
+    var gid = Date.now();
+    return 'd-' + gid;
 }
 
-var arr = [];
-(async () => {
+var queryAll = async () => {
     var user = await User.findAll({});
     console.log(`find ${user} user`)
-    for (let u of user) {
-        arr.push(JSON.parse(JSON.stringify(u)))
-    }
-})()
-
-var todos = [
-    {
-        id: nextId(),
-        name: 'Learn Git',
-        description: 'Learn how to use git as distributed version control'
-    },
-    {
-        id: nextId(),
-        name: 'Learn JavaScript',
-        description: 'Learn JavaScript, Node.js, NPM and other libraries'
-    },
-    {
-        id: nextId(),
-        name: 'Learn Python',
-        description: 'Learn Python, WSGI, asyncio and NumPy'
-    },
-    {
-        id: nextId(),
-        name: 'Learn Java',
-        description: 'Learn Java, Servlet, Maven and Spring'
-    }
-];
+    return user
+}
+//条件查询删除
+var queryFromSomewhere = async (animals) => {
+    var pets = await User.findAll({
+        where: {
+            id: animals
+        }
+    });
+    console.log(`find ${pets.length} pets`);
+    return pets
+}
 
 module.exports = {
+    //查询
     'GET /api/todos': async (ctx, next) => {
+        var arr = [];
+        var pets = await queryAll();
+        for (let p of pets) {
+            arr.push(JSON.parse(JSON.stringify(p)))
+        }
+        console.log('arr',arr)
         ctx.rest({
-            todos: arr
+            code:200,
+            todos: arr,
+            message:'查询成功'
         });
     },
-
+    //新增
     'POST /api/todos': async (ctx, next) => {
         var
             t = ctx.request.body,
@@ -56,55 +48,88 @@ module.exports = {
         if (!t.name || !t.name.trim()) {
             throw new APIError('invalid_input', 'Missing name');
         }
-        if (!t.description || !t.description.trim()) {
-            throw new APIError('invalid_input', 'Missing description');
+        if (!t.passwd || !t.passwd.trim()) {
+            throw new APIError('invalid_input', 'Missing passwd');
         }
         todo = {
             id: nextId(),
             name: t.name.trim(),
-            description: t.description.trim()
+            passwd: t.passwd.trim(),
+            email: t.email.trim()+'-'+Date.now()+'@password',
+            gender: t.gender?true:false,
+            birth: t.birth,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+            version: '0',
         };
-        todos.push(todo);
-        ctx.rest(todo);
+        var dog = await User.create(todo);
+        console.log('created: ' + JSON.stringify(dog));
+        var arr = [];
+        var pets = await queryAll();
+        for (let p of pets) {
+            arr.push(JSON.parse(JSON.stringify(p)))
+        }
+        // ctx.rest({
+        //     code:200,
+        //     todos: arr,
+        //     message: '添加成功'
+        // });
+        ctx.rest({
+            code:200,
+            todo:todo,
+            message:'添加成功'
+        });
     },
-
+    //修改
     'PUT /api/todos/:id': async (ctx, next) => {
-        var
-            t = ctx.request.body,
-            index = -1,
-            i, todo;
+        var t = ctx.request.body;
         if (!t.name || !t.name.trim()) {
             throw new APIError('invalid_input', 'Missing name');
         }
-        if (!t.description || !t.description.trim()) {
+        if (!t.email || !t.email.trim()) {
             throw new APIError('invalid_input', 'Missing description');
         }
-        for (i=0; i<todos.length; i++) {
-            if (todos[i].id === ctx.params.id) {
-                index = i;
-                break;
-            }
+        var pets = await queryFromSomewhere(ctx.params.id);
+        for (let p of pets) {
+            p.name = t.name.trim();
+            p.email = t.email.trim();
+            p.gender = true;
+            p.updatedAt = Date.now();
+            p.version++;
+            await p.save();
         }
-        if (index === -1) {
-            throw new APIError('notfound', 'Todo not found by id: ' + ctx.params.id);
+        var arr = [];
+        var pets = await queryAll();
+        for (let p of pets) {
+            arr.push(JSON.parse(JSON.stringify(p)))
         }
-        todo = todos[index];
-        todo.name = t.name.trim();
-        todo.description = t.description.trim();
-        ctx.rest(todo);
+        ctx.rest({
+            code:200,
+            todos: arr,
+            message: '更新成功'
+        });
+        // ctx.rest();
     },
 
     'DELETE /api/todos/:id': async (ctx, next) => {
-        var i, index = -1;
-        for (i=0; i<todos.length; i++) {
-            if (todos[i].id === ctx.params.id) {
-                index = i;
-                break;
-            }
-        }
-        if (index === -1) {
+        var pets = await queryFromSomewhere(ctx.params.id);
+        console.log(pets.length)
+        if(pets.length === 0) {
             throw new APIError('notfound', 'Todo not found by id: ' + ctx.params.id);
+            return;
         }
-        ctx.rest(todos.splice(index, 1)[0]);
+        for (let p of pets) {
+            await p.destroy()
+        }
+        var arr = [];
+        var pets = await queryAll();
+        for (let p of pets) {
+            arr.push(JSON.parse(JSON.stringify(p)))
+        }
+        ctx.rest({
+            code:200,
+            todos: arr,
+            message: '删除成功'
+        });
     }
 }

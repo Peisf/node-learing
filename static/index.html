@@ -50,7 +50,7 @@ $(function () {
                 var that = this;
                 that.$resource('/api/todos').save(todo).then(function (resp) {
                     resp.json().then(function (result) {
-                        that.todos.push(result);
+                        that.todos.push(result.todo);
                     });
                 }, showError);
             },
@@ -58,7 +58,7 @@ $(function () {
                 var that = this;
                 var t = {
                     name: todo.name,
-                    description: todo.description
+                    email: todo.email
                 };
                 t[prop] = e.target.innerText;
                 if (t[prop] === todo[prop]) {
@@ -67,7 +67,7 @@ $(function () {
                 that.$resource('/api/todos/' + todo.id).update(t).then(function (resp) {
                     resp.json().then(function (r) {
                         todo.name = r.name;
-                        todo.description = r.description;
+                        todo.email = r.email;
                     });
                 }, function (resp) {
                     e.target.innerText = todo[prop];
@@ -97,13 +97,18 @@ $(function () {
         el: '#vmAdd',
         data: {
             name: '',
-            description: ''
+            email: '',
+            passwd:'',
+            birth:''
+
         },
         methods: {
             submit: function () {
                 vm.create(this.$data);
                 this.name = '';
-                this.description = '';
+                this.email = '';
+                this.passwd = '';
+                this.birth = ''
             }
         }
     });
@@ -149,7 +154,7 @@ $(function () {
                                 <li v-for="t in todos">
                                     <dl>
                                         <dt contenteditable="true" v-on:blur="update(t, 'name', $event)">{{ t.name }}</dt>
-                                        <dd contenteditable="true" v-on:blur="update(t, 'description', $event)">{{ t.description }}</dd>
+                                        <dd contenteditable="true" v-on:blur="update(t, 'email', $event)">{{ t.email }}</dd>
                                         <dd><a href="#0" v-on:click="remove(t)">Delete</a></dd>
                                     </dl>
                                 </li>
@@ -170,8 +175,16 @@ $(function () {
                                 <input type="text" v-model="name" class="form-control" placeholder="Enter name">
                             </div>
                             <div class="form-group">
-                                <label>Description:</label>
-                                <input type="text" v-model="description" class="form-control" placeholder="Enter description">
+                                <label>passwd:</label>
+                                <input type="text" v-model="passwd" class="form-control" placeholder="Enter passwd">
+                            </div>
+                            <div class="form-group">
+                                <label>email:</label>
+                                <input type="text" v-model="email" class="form-control" placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label>birth:</label>
+                                <input type="text" v-model="birth" class="form-control" placeholder="Enter birth">
                             </div>
                             <button type="submit" class="btn btn-default">Add</button>
                         </form>

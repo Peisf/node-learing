@@ -21,6 +21,10 @@ app.use(async (ctx, next) => {
     ctx.response.set('X-Response-Time', `${execTime}ms`);
 });
 
+app.use(async (ctx,next) => {
+    await ctx.set('Access-Control-Allow-Origin','*');    //允许通过所有的
+    await next();
+});
 // static file support:
 let staticFiles = require('./static-files');
 app.use(staticFiles('/static/', __dirname + '/static'));

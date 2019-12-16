@@ -1,3 +1,4 @@
+const uuid = require('node-uuid');
 const APIError = require('../rest').APIError;
 const model = require('../model');
 let
@@ -5,8 +6,7 @@ let
     User = model.User;
 
 function nextId() {
-    var gid = Date.now();
-    return 'd-' + gid;
+    return uuid.v4();
 }
 
 var queryAll = async () => {

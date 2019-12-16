@@ -69,11 +69,6 @@ module.exports = {
         for (let p of pets) {
             arr.push(JSON.parse(JSON.stringify(p)))
         }
-        // ctx.rest({
-        //     code:200,
-        //     todos: arr,
-        //     message: '添加成功'
-        // });
         ctx.rest({
             code:200,
             todo:todo,
@@ -98,14 +93,9 @@ module.exports = {
             p.version++;
             await p.save();
         }
-        var arr = [];
-        var pets = await queryAll();
-        for (let p of pets) {
-            arr.push(JSON.parse(JSON.stringify(p)))
-        }
         ctx.rest({
-            code:200,
-            todos: arr,
+            code: 200,
+            todo: pets[0],
             message: '更新成功'
         });
         // ctx.rest();
@@ -128,7 +118,7 @@ module.exports = {
         }
         ctx.rest({
             code:200,
-            todos: arr,
+            todo: arr,
             message: '删除成功'
         });
     }

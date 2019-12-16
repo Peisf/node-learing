@@ -17,12 +17,15 @@
         "url": "https://github.com/michaelliao/learn-javascript.git"
     },
     "dependencies": {
-        "sequelize": "^5.21.2",
+        "koa": "^2.11.0",
+        "koa-bodyparser": "^4.2.1",
+        "koa-logger": "^3.2.1",
+        "koa-router": "^7.4.0",
+        "mime": "^2.4.4",
+        "moment": "latest",
         "mysql2": "^2.0.2",
-        "koa": "latest",
-        "koa-bodyparser": "latest",
-        "node-uuid": "latest",
-        "mz": "latest",
-        "mime": "latest"
+        "mz": "^2.7.0",
+        "node-uuid": "^1.4.8",
+        "sequelize": "^5.21.2"
     }
 }

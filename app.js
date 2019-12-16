@@ -1,15 +1,17 @@
 const Koa = require('koa');
-
-const bodyParser = require('koa-bodyparser');
-
+const Koa_logger = require('koa-logger');   //日志
+const bodyParser = require('koa-bodyparser');   //解决post请求
 const controller = require('./controller');
-
+const Moment = require('moment');
 const rest = require('./rest');
 
 const app = new Koa();
-
+const logger = Koa_logger((str) => {                // 使用日志中间件
+    console.log(Moment().format('YYYY-MM-DD HH:mm:ss')+str);
+});
 const isProduction = process.env.NODE_ENV === 'production';
 
+app.use(logger);
 // log request URL:
 app.use(async (ctx, next) => {
     console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);

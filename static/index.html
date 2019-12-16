@@ -65,7 +65,9 @@ $(function () {
                     return;
                 }
                 that.$resource('/api/todos/' + todo.id).update(t).then(function (resp) {
-                    resp.json().then(function (r) {
+                    resp.json().then(function (result) {
+                        console.log(result)
+                        let r = result.todo;
                         todo.name = r.name;
                         todo.email = r.email;
                     });
